@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 첫 번째 아이디어</title>
+    <!-- Google Fonts: Prettify with Outfit & Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background glowing shapes for premium visual depth -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    
+    <main class="container">
+        <div class="card" id="idea-card">
+            <div class="card-glow"></div>
+            <div class="card-content">
+                <span class="badge">Concept #01</span>
+                <h1 class="main-title">내 첫 번째 아이디어</h1>
+                <p class="subtitle">모든 위대한 혁신은 하나의 작은 생각에서 시작됩니다.</p>
+                <div class="accent-line"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Interactive mouse movement effect on the card for high-end micro-interaction
+        const card = document.getElementById('idea-card');
+        
+        document.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left - (rect.width / 2);
+            const y = e.clientY - rect.top - (rect.height / 2);
+            
+            // Calculate tilt
+            const tiltX = (y / (rect.height / 2)) * -10; // max 10 degrees tilt
+            const tiltY = (x / (rect.width / 2)) * 10;
+            
+            card.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+            
+            // Update glow position
+            const glow = card.querySelector('.card-glow');
+            const percentX = ((e.clientX - rect.left) / rect.width) * 100;
+            const percentY = ((e.clientY - rect.top) / rect.height) * 100;
+            glow.style.background = `radial-gradient(circle 120px at ${percentX}% ${percentY}%, rgba(255, 255, 255, 0.15), transparent)`;
+        });
+        
+        document.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+            const glow = card.querySelector('.card-glow');
+            glow.style.background = 'transparent';
+        });
+    </script>
+</body>
+</html>
