@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>내 첫 번째 아이디어</title>
+    <title>오늘도 힘내세요!</title>
     <!-- Google Fonts: Prettify with Outfit & Noto Sans KR -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,7 +20,7 @@
             <div class="card-glow"></div>
             <div class="card-content">
                 <span class="badge">Concept #01</span>
-                <h1 class="main-title">내 첫 번째 아이디어</h1>
+                <h1 class="main-title">오늘도 힘내세요!</h1>
                 <p class="subtitle">모든 위대한 혁신은 하나의 작은 생각에서 시작됩니다.</p>
                 <div class="accent-line"></div>
             </div>
@@ -46,7 +46,7 @@
             const glow = card.querySelector('.card-glow');
             const percentX = ((e.clientX - rect.left) / rect.width) * 100;
             const percentY = ((e.clientY - rect.top) / rect.height) * 100;
-            glow.style.background = `radial-gradient(circle 120px at ${percentX}% ${percentY}%, rgba(255, 255, 255, 0.15), transparent)`;
+            glow.style.background = `radial-gradient(circle 140px at ${percentX}% ${percentY}%, rgba(99, 102, 241, 0.1), transparent)`;
         });
         
         document.addEventListener('mouseleave', () => {

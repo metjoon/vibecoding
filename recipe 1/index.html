@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="음성 인식과 버튼 입력을 지원하는 프리미엄 스마트 계산기. 계산 히스토리, 단위 변환, 테마 전환 기능 포함.">
+    <title>CalcVoice — 스마트 음성 계산기</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background particles -->
+    <div class="bg-particles" id="bgParticles"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="2" rx="2" width="16" height="20"/>
+                        <line x1="8" y1="6" x2="16" y2="6"/>
+                        <circle cx="9" cy="11" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="11" r="1" fill="currentColor"/>
+                        <circle cx="9" cy="15" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="15" r="1" fill="currentColor"/>
+                        <circle cx="12" cy="11" r="1" fill="currentColor"/>
+                        <circle cx="12" cy="15" r="1" fill="currentColor"/>
+                        <circle cx="9" cy="19" r="1" fill="currentColor"/>
+                        <circle cx="12" cy="19" r="1" fill="currentColor"/>
+                        <circle cx="15" cy="19" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+                <h1>CalcVoice</h1>
+            </div>
+            <div class="header-controls">
+                <button class="theme-toggle" id="themeToggle" title="테마 전환">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                </button>
+                <button class="history-toggle" id="historyToggle" title="계산 히스토리">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12,6 12,12 16,14"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Calculator Panel -->
+            <div class="calculator-panel">
+                <!-- Mode tabs -->
+                <div class="mode-tabs">
+                    <button class="mode-tab active" data-mode="standard" id="tabStandard">기본</button>
+                    <button class="mode-tab" data-mode="scientific" id="tabScientific">공학용</button>
+                    <button class="mode-tab" data-mode="converter" id="tabConverter">단위변환</button>
+                </div>
+
+                <!-- Display -->
+                <div class="display-area">
+                    <div class="expression" id="expression"></div>
+                    <div class="result" id="result">0</div>
+                    <div class="voice-indicator" id="voiceIndicator">
+                        <div class="voice-wave">
+                            <span></span><span></span><span></span><span></span><span></span>
+                        </div>
+                        <span class="voice-text">음성 인식 중...</span>
+                    </div>
+                </div>
+
+                <!-- Voice button -->
+                <div class="voice-section">
+                    <button class="voice-btn" id="voiceBtn" title="음성으로 계산하기">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                        </svg>
+                        <span>음성 입력</span>
+                    </button>
+                    <p class="voice-hint">예: "123 더하기 456", "25의 제곱근"</p>
+                </div>
+
+                <!-- Standard Keypad -->
+                <div class="keypad standard-keypad" id="standardKeypad">
+                    <button class="key func" data-action="clear" id="keyClear">AC</button>
+                    <button class="key func" data-action="sign" id="keySign">±</button>
+                    <button class="key func" data-action="percent" id="keyPercent">%</button>
+                    <button class="key operator" data-action="divide" id="keyDivide">÷</button>
+
+                    <button class="key number" data-action="7" id="key7">7</button>
+                    <button class="key number" data-action="8" id="key8">8</button>
+                    <button class="key number" data-action="9" id="key9">9</button>
+                    <button class="key operator" data-action="multiply" id="keyMultiply">×</button>
+
+                    <button class="key number" data-action="4" id="key4">4</button>
+                    <button class="key number" data-action="5" id="key5">5</button>
+                    <button class="key number" data-action="6" id="key6">6</button>
+                    <button class="key operator" data-action="subtract" id="keySubtract">−</button>
+
+                    <button class="key number" data-action="1" id="key1">1</button>
+                    <button class="key number" data-action="2" id="key2">2</button>
+                    <button class="key number" data-action="3" id="key3">3</button>
+                    <button class="key operator" data-action="add" id="keyAdd">+</button>
+
+                    <button class="key number zero" data-action="0" id="key0">0</button>
+                    <button class="key number" data-action="decimal" id="keyDecimal">.</button>
+                    <button class="key equals" data-action="equals" id="keyEquals">=</button>
+                </div>
+
+                <!-- Scientific Keypad -->
+                <div class="keypad scientific-keypad hidden" id="scientificKeypad">
+                    <button class="key sci" data-action="sin" id="keySin">sin</button>
+                    <button class="key sci" data-action="cos" id="keyCos">cos</button>
+                    <button class="key sci" data-action="tan" id="keyTan">tan</button>
+                    <button class="key sci" data-action="log" id="keyLog">log</button>
+                    <button class="key sci" data-action="ln" id="keyLn">ln</button>
+
+                    <button class="key sci" data-action="sqrt" id="keySqrt">√</button>
+                    <button class="key sci" data-action="square" id="keySquare">x²</button>
+                    <button class="key sci" data-action="cube" id="keyCube">x³</button>
+                    <button class="key sci" data-action="power" id="keyPower">xʸ</button>
+                    <button class="key sci" data-action="factorial" id="keyFactorial">x!</button>
+
+                    <button class="key sci" data-action="pi" id="keyPi">π</button>
+                    <button class="key sci" data-action="e" id="keyE">e</button>
+                    <button class="key sci" data-action="openParen" id="keyOpenParen">(</button>
+                    <button class="key sci" data-action="closeParen" id="keyCloseParen">)</button>
+                    <button class="key sci" data-action="backspace" id="keyBackspace">⌫</button>
+
+                    <button class="key func" data-action="clear" id="keyClearSci">AC</button>
+                    <button class="key func" data-action="sign" id="keySignSci">±</button>
+                    <button class="key func" data-action="percent" id="keyPercentSci">%</button>
+                    <button class="key operator" data-action="divide" id="keyDivideSci">÷</button>
+                    <button class="key sci" data-action="abs" id="keyAbs">|x|</button>
+
+                    <button class="key number" data-action="7" id="key7Sci">7</button>
+                    <button class="key number" data-action="8" id="key8Sci">8</button>
+                    <button class="key number" data-action="9" id="key9Sci">9</button>
+                    <button class="key operator" data-action="multiply" id="keyMultiplySci">×</button>
+                    <button class="key sci" data-action="inv" id="keyInv">1/x</button>
+
+                    <button class="key number" data-action="4" id="key4Sci">4</button>
+                    <button class="key number" data-action="5" id="key5Sci">5</button>
+                    <button class="key number" data-action="6" id="key6Sci">6</button>
+                    <button class="key operator" data-action="subtract" id="keySubtractSci">−</button>
+                    <button class="key sci" data-action="exp" id="keyExp">EXP</button>
+
+                    <button class="key number" data-action="1" id="key1Sci">1</button>
+                    <button class="key number" data-action="2" id="key2Sci">2</button>
+                    <button class="key number" data-action="3" id="key3Sci">3</button>
+                    <button class="key operator" data-action="add" id="keyAddSci">+</button>
+                    <button class="key equals sci-equals" data-action="equals" id="keyEqualsSci" rowspan="2">=</button>
+
+                    <button class="key number sci-zero" data-action="0" id="key0Sci">0</button>
+                    <button class="key number" data-action="decimal" id="keyDecimalSci">.</button>
+                    <button class="key sci" data-action="ans" id="keyAns">ANS</button>
+                </div>
+
+                <!-- Converter Panel -->
+                <div class="converter-panel hidden" id="converterPanel">
+                    <div class="converter-type-selector">
+                        <button class="converter-type active" data-type="length" id="convLength">길이</button>
+                        <button class="converter-type" data-type="weight" id="convWeight">무게</button>
+                        <button class="converter-type" data-type="temperature" id="convTemp">온도</button>
+                        <button class="converter-type" data-type="speed" id="convSpeed">속도</button>
+                    </div>
+                    <div class="converter-inputs">
+                        <div class="converter-field">
+                            <select class="converter-select" id="fromUnit"></select>
+                            <input type="number" class="converter-input" id="fromValue" placeholder="값 입력" value="">
+                        </div>
+                        <button class="swap-btn" id="swapUnits" title="단위 교환">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="17,1 21,5 17,9"/>
+                                <path d="M3 5h18"/>
+                                <polyline points="7,15 3,19 7,23"/>
+                                <path d="M21 19H3"/>
+                            </svg>
+                        </button>
+                        <div class="converter-field">
+                            <select class="converter-select" id="toUnit"></select>
+                            <input type="number" class="converter-input" id="toValue" placeholder="결과" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Panel -->
+            <div class="history-panel" id="historyPanel">
+                <div class="history-header">
+                    <h2>계산 히스토리</h2>
+                    <button class="clear-history" id="clearHistory" title="히스토리 삭제">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3,6 5,6 21,6"/>
+                            <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="history-empty">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12,6 12,12 16,14"/>
+                        </svg>
+                        <p>아직 계산 기록이 없습니다</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Keyboard shortcut hint -->
+        <footer class="app-footer">
+            <p>⌨️ 키보드 입력 지원 · 🎙️ 음성 명령 지원 · 📱 반응형 디자인</p>
+        </footer>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
