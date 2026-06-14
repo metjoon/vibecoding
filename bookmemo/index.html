@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookMemo</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+    
+    <main class="main-container">
+        <nav class="top-nav">
+            <div class="logo">BookMemo</div>
+            <button id="logoutBtn" class="btn-secondary" style="display: none;">로그아웃</button>
+        </nav>
+
+        <!-- Login Section -->
+        <div id="loginSection" style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+            <div class="glass text-center" style="padding: 3rem; max-width: 400px; width: 100%;">
+                <h1 style="margin-bottom: 1rem; font-size: 2rem;">BookMemo</h1>
+                <p style="color: #94a3b8; margin-bottom: 2.5rem;">도서 메모 앱에 로그인하여 나만의 핵심 문장을 기록하세요.</p>
+                <button id="loginBtn" class="btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">
+                    Google로 시작하기
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard Section (Hidden by default) -->
+        <div id="dashboardSection" style="display: none; grid-template-columns: 1fr; gap: 2rem;">
+            <div class="dashboard-grid">
+                <div class="glass" style="padding: 2rem; height: fit-content;">
+                    <h2 style="margin-bottom: 1.5rem;">새로운 메모 기록</h2>
+                    <form id="memoForm" style="display: flex; flex-direction: column; gap: 1rem;">
+                        <input type="text" id="bookTitle" placeholder="책 제목" required>
+                        <textarea id="keySentence" placeholder="기억에 남는 핵심 문장" rows="2" required></textarea>
+                        <textarea id="memoText" placeholder="나만의 메모 (선택사항)" rows="4"></textarea>
+                        <button type="submit" id="saveBtn" class="btn-primary" style="align-self: flex-start;">
+                            메모 저장하기
+                        </button>
+                    </form>
+                </div>
+                
+                <div>
+                    <h2 style="margin-bottom: 1.5rem;">내 도서 메모</h2>
+                    <div id="memoList" class="memo-list-grid">
+                        <!-- Memos will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
