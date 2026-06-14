@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart QR Generator</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    
+    <main class="container">
+        <div class="glass-card">
+            <header>
+                <h1>QR Generator</h1>
+                <p>Create beautiful QR codes instantly.</p>
+            </header>
+
+            <div class="input-group">
+                <input type="url" id="urlInput" placeholder="Enter URL (e.g., https://example.com)" autocomplete="off">
+                <button id="generateBtn" aria-label="Generate QR Code">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="qr-container" id="qrContainer">
+                <div id="qrcode"></div>
+                <div class="placeholder-text" id="placeholderText">
+                    Your QR code will appear here
+                </div>
+            </div>
+            
+            <div class="action-buttons hidden" id="actionButtons">
+                <button id="downloadBtn" class="secondary-btn">Download</button>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
