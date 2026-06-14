@@ -3,7 +3,13 @@
 const SUPABASE_URL = 'https://zmkcgfkpmvxwaresodme.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpta2NnZmtwbXZ4d2FyZXNvZG1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0MjQwNTQsImV4cCI6MjA5NzAwMDA1NH0.7PA4MHepau-bLHEmgJcvVuztVrnffEUDBjolqljupho';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// CDN 로드 실패 체크
+if (!window.supabase) {
+    alert("Supabase 라이브러리를 불러오지 못했습니다. 인터넷 연결이나 광고 차단기(AdBlock)를 잠시 꺼주세요.");
+}
+
+// 변수명 충돌을 피하기 위해 supabaseClient로 이름 변경
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // DOM Elements
 const loginSection = document.getElementById('loginSection');
@@ -17,25 +23,29 @@ let currentUser = null;
 
 // Initialization
 async function init() {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (session) {
-        currentUser = session.user;
-        showDashboard();
-    } else {
-        showLogin();
-    }
-
-    // Listen for auth state changes
-    supabase.auth.onAuthStateChange((_event, session) => {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        
         if (session) {
             currentUser = session.user;
             showDashboard();
         } else {
-            currentUser = null;
             showLogin();
         }
-    });
+
+        // Listen for auth state changes
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+            if (session) {
+                currentUser = session.user;
+                showDashboard();
+            } else {
+                currentUser = null;
+                showLogin();
+            }
+        });
+    } catch (err) {
+        console.error("초기화 에러:", err);
+    }
 }
 
 // UI State Management
@@ -54,26 +64,44 @@ function showDashboard() {
 
 // Authentication
 loginBtn.addEventListener('click', async () => {
-    loginBtn.textContent = '로그인 중...';
-    loginBtn.disabled = true;
-    
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-            redirectTo: window.location.origin + window.location.pathname
+    try {
+        loginBtn.textContent = '로그인 중...';
+        loginBtn.disabled = true;
+        
+        console.log('로그인 시작됨. 현재 URL:', window.location.href);
+        
+        let redirectUrl = window.location.origin + window.location.pathname;
+        // file:/// 로 실행했을 경우 대비 예외 처리
+        if (window.location.protocol === 'file:') {
+            alert('로컬 파일(file:///)로 직접 열면 구글 로그인이 작동하지 않습니다. npx serve 를 이용하시거나 GitHub Pages 주소로 접속해주세요.');
+            loginBtn.textContent = 'Google로 시작하기';
+            loginBtn.disabled = false;
+            return;
         }
-    });
-    
-    if (error) {
-        console.error(error);
-        alert('로그인 중 오류가 발생했습니다.');
+
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+            provider: 'google',
+            options: {
+                redirectTo: redirectUrl
+            }
+        });
+        
+        if (error) {
+            console.error('OAuth 에러:', error);
+            alert('로그인 중 오류가 발생했습니다: ' + error.message);
+            loginBtn.textContent = 'Google로 시작하기';
+            loginBtn.disabled = false;
+        }
+    } catch (err) {
+        console.error('런타임 에러:', err);
+        alert('알 수 없는 오류가 발생했습니다: ' + err.message);
         loginBtn.textContent = 'Google로 시작하기';
         loginBtn.disabled = false;
     }
 });
 
 logoutBtn.addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
 });
 
 // Memo Logic
@@ -88,23 +116,28 @@ memoForm.addEventListener('submit', async (e) => {
     saveBtn.textContent = '저장 중...';
     saveBtn.disabled = true;
 
-    const { error } = await supabase
-        .from('book_memos')
-        .insert([
-            { 
-                user_id: currentUser.id, 
-                book_title: bookTitle, 
-                key_sentence: keySentence, 
-                memo: memoText 
-            }
-        ]);
+    try {
+        const { error } = await supabaseClient
+            .from('book_memos')
+            .insert([
+                { 
+                    user_id: currentUser.id, 
+                    book_title: bookTitle, 
+                    key_sentence: keySentence, 
+                    memo: memoText 
+                }
+            ]);
 
-    if (error) {
-        console.error(error);
-        alert('메모 저장 중 오류가 발생했습니다. 데이터베이스 테이블을 확인하세요.');
-    } else {
-        memoForm.reset();
-        fetchMemos();
+        if (error) {
+            console.error('데이터베이스 에러:', error);
+            alert('메모 저장 중 오류가 발생했습니다: ' + error.message);
+        } else {
+            memoForm.reset();
+            fetchMemos();
+        }
+    } catch (err) {
+        console.error('저장 에러:', err);
+        alert('저장 중 알 수 없는 오류가 발생했습니다.');
     }
     
     saveBtn.textContent = '메모 저장하기';
@@ -112,33 +145,41 @@ memoForm.addEventListener('submit', async (e) => {
 });
 
 async function fetchMemos() {
-    const { data: memos, error } = await supabase
-        .from('book_memos')
-        .select('*')
-        .order('created_at', { ascending: false });
+    try {
+        const { data: memos, error } = await supabaseClient
+            .from('book_memos')
+            .select('*')
+            .order('created_at', { ascending: false });
 
-    if (error) {
-        console.error(error);
-        return;
+        if (error) {
+            console.error('불러오기 에러:', error);
+            return;
+        }
+
+        renderMemos(memos);
+    } catch (err) {
+        console.error('불러오기 런타임 에러:', err);
     }
-
-    renderMemos(memos);
 }
 
 // Expose deleteMemo globally for inline onclick
 window.deleteMemo = async function(id) {
     if (!confirm('정말로 이 메모를 삭제하시겠습니까?')) return;
 
-    const { error } = await supabase
-        .from('book_memos')
-        .delete()
-        .eq('id', id);
+    try {
+        const { error } = await supabaseClient
+            .from('book_memos')
+            .delete()
+            .eq('id', id);
 
-    if (error) {
-        console.error(error);
-        alert('삭제 중 오류가 발생했습니다.');
-    } else {
-        fetchMemos();
+        if (error) {
+            console.error('삭제 에러:', error);
+            alert('삭제 중 오류가 발생했습니다: ' + error.message);
+        } else {
+            fetchMemos();
+        }
+    } catch (err) {
+        console.error('삭제 런타임 에러:', err);
     }
 }
 
